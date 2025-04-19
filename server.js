@@ -24,32 +24,48 @@ const pusher = new Pusher({
 });
 
 app
-.prepare()
-.then(() => {
-  const server = express();
-  
-  // Middleware
-  server.use(cors());
-  server.use(bodyParser.json());
-  server.use(bodyParser.urlencoded({ extended: true }));
-  
-  // Next.js request handling
-  server.get("*", (req, res) => {
-    return handler(req, res);
-  });
-  
-  // error handling
-  server.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send("Something broke!");
-  });
-  
-  const port = process.env.PORT || 3000;
-  
-  server.listen(port, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
-  });
+  .prepare()
+  .then(() => {
+    const server = express();
+
+    // Middleware
+    server.use(cors());
+    server.use(bodyParser.json());
+    server.use(bodyParser.urlencoded({ extended: true }));
+
+    // Next.js request handling
+    server.get("*", (req, res) => {
+      return handler(req, res);
+    });
+
+    // error handling
+    server.use((err, req, res, next) => {
+      console.error(err.stack);
+      res.status(500).send("Something broke!");
+    });
+
+    const port = process.env.PORT || 3000;
+
+    const chatHistory = { messages: [] };
+    
+    // /message and /messages rout config
+    server.post("/message", (req, res, next) => {
+      const { user = null, message = "", timestamp = +new Date() } = req.body;
+      const sentimentScore = sentiment.analyze(message).score;
+      const chat = { user, message, timestamp, sentiment: sentimentScore };
+
+      chatHistory.messages.push(chat);
+      pusher.trigger("chat-room", "new-message", { chat });
+    });
+
+    server.post("/messages", (req, res, next) => {
+      res.json({ ...chatHistory, status: "success" });
+    });
+
+    server.listen(port, (err) => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+    });
   })
   .catch((ex) => {
     console.error(ex.stack);
