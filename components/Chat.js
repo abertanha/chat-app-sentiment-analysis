@@ -34,7 +34,11 @@ class Chat extends Component {
       });
     });
   }
-
+  getSentimentColor = (score) => {
+    if (score > 0) return 'bg-green-100 border-1-4 border-green-500';
+    if (score < 0) return 'bg-red-100 border-1-4 border-red-500';
+    return 'bg-gray-100 border-1-4 border-gray-500';
+  };
   componentWillUnmount() {
     this.pusher.disconnect();
   }
@@ -103,7 +107,11 @@ class Chat extends Component {
                     </div>
                   )}
 
-                  <ChatMessage message={chat.message} position={position} />
+                  <ChatMessage message={chat.message} 
+                    position={position} 
+                    sentiment={chat.sentiment} 
+                    colorClass={this.getSentimentColor(chat.sentiment)}
+                  />
                 </Fragment>
               );
             })}
