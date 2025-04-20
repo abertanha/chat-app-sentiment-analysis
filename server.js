@@ -23,6 +23,12 @@ const pusher = new Pusher({
   useTLS: true,
 });
 
+if (!process.env.PUSHER_APP_ID || !process.env.PUSHER_APP_KEY) {
+  throw new Error("Missing Pusher credentials in .env");
+}else {
+  console.log("> Pusher enviroment credentials found!");
+}
+
 app
   .prepare()
   .then(() => {
