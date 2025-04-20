@@ -4,7 +4,7 @@ class ChatMessage extends Component {
   render() {
     const { position = "left", message, colorClass } = this.props;
     const isRight = position.toLowerCase() === "right";
-    
+
     const align = isRight ? "text-right" : "text-left";
     const justify = isRight ? "justify-content-end" : "justify-content-start";
 
@@ -18,8 +18,7 @@ class ChatMessage extends Component {
       lineHeight: 1.4,
       whiteSpace: "pre-wrap",
     };
-    console.log(colorClass); // TO DO
-    
+
     return (
       <div className={`w-100 my-1 d-flex ${justify}`}>
         <div
@@ -32,7 +31,7 @@ class ChatMessage extends Component {
           >
             {message}
           </span>
-            </div>
+        </div>
       </div>
     );
   }
